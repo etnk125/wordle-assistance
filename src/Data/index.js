@@ -1,7 +1,7 @@
-const Data = {
+const Word = {
   en: {
-    suggests: ["frame", "elder", "crane", "skill", "skate"],
-    allwords: [
+    goodWords: ["frame", "elder", "crane", "skill", "skate"],
+    badWords: [
       "aaaaa",
       "bbbbb",
       "ccccc",
@@ -14,9 +14,9 @@ const Data = {
   },
 };
 
-function getData(type, lang) {
+function getWord(type, lang) {
   // console.log(type, lang);
-  return Data[lang][type];
+  return Word[lang][type];
 }
 
-export default getData;
+export default getWord;
