@@ -1,0 +1,17 @@
+.green {
+  background-color: green;
+  color: white;
+  border: none !important
+}
+
+.yellow {
+  background-color: yellow;
+  color: white;
+  border: none !important
+}
+
+.grey {
+  background-color: grey;
+  color: white;
+  border: none !important
+}
