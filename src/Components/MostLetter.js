@@ -20,9 +20,9 @@ function MostLetter({ letters, selectLetter, unselectLetter }) {
     e.preventDefault();
     let btnClass = document.getElementById("tag" + letter).classList;
     if (btnClass.contains("selected")) {
-      selectLetter(letter);
-    } else {
       unselectLetter(letter);
+    } else {
+      selectLetter(letter);
     }
     btnClass.toggle("selected");
   }

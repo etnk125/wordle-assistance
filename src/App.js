@@ -28,7 +28,16 @@ function App() {
   useEffect(() => {
     fetchWords.current();
   }, []);
-  console.log(availableWords, "app");
+
+  const resetLetter = useRef(() => {});
+  resetLetter.current = () => {
+    updateUsedLetter();
+    setTag([]);
+  };
+  useEffect(() => {
+    resetLetter.current();
+  }, [availableWords]);
+  // console.log(availableWords, "app");
   return (
     <>
       <header>
@@ -44,7 +53,7 @@ function App() {
             unselectLetter={unselectLetter}
           />
           <WordsContainer
-            availableWords={availableWords}
+            availableWords={getFilteredWords(availableWords)}
             goodWords={goodWords}
             badWords={badWords}
           />
@@ -70,18 +79,16 @@ function App() {
           }
         return true;
       });
-    setLetter(letters);
-  }
-  function resetLetter() {
-    updateUsedLetter();
-    setTag([]);
+    setLetter((prev) => [...letters]);
   }
 
   function selectLetter(letter) {
     setTag((prev) => [...prev, letter]);
   }
   function unselectLetter(letter) {
-    setTag((prev) => prev.splice(prev.indexOf(letter), 1));
+    setTag((prev) => {
+      return prev.filter((i) => letter === i);
+    });
   }
   function getState(letter, index) {
     return states[index][letter];
@@ -93,6 +100,19 @@ function App() {
       ...prev,
       { word: word, id: Date.now().toString() },
     ]);
+  }
+
+  function getFilteredWords(words) {
+    console.log("tag", tag);
+    const ret = words.filter((word) => {
+      for (let i of tag) {
+        console.log(word.includes(i));
+        return word.includes(i);
+      }
+      return false;
+    });
+    console.log(words, ret);
+    return ret;
   }
 
   function updateAvailableWords() {

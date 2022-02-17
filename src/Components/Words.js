@@ -8,6 +8,7 @@ function Words({ title, words, onWordClick }) {
   const WordElement = (word) => {
     return (
       <button
+        key={title + word}
         onClick={(e) => {
           onWordClick(e, word);
           setLimit(DEFAULT_LIMIT);
