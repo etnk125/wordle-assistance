@@ -1,0 +1,12 @@
+.words {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr)
+}
+
+.words-container {
+  margin: 5px
+}
+
+.loadmore-btn {
+  width: 100%
+}

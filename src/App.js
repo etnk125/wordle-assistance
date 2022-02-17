@@ -1,150 +1,138 @@
-import "./App.css";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  createContext,
-  useContext,
-} from "react";
-import "./color.css";
+// import "./App.css";
+import React, { useEffect, useState, useRef, createContext } from "react";
 import getWords from "./Data";
-
-let STATES = ["white", "grey", "yellow", "green"];
+import SubmittedWords from "./Components/SubmittedWords";
+import MostLetter from "./Components/MostLetter";
+import WordsContainer from "./Components/WordListsContainer";
 
 const StateContext = createContext();
 function App() {
   const [goodWords, setGoodWords] = useState([]);
-  const [allWords, setAllWords] = useState([]);
+  const [badWords, setBadWords] = useState([]);
   const [submittedWords, setSubmittedWords] = useState([]);
   const [availableWords, setAvailableWords] = useState([]);
   const [states, setStates] = useState([]);
+  const [letter, setLetter] = useState([]);
+  const [tag, setTag] = useState([]);
 
   const fetchWords = useRef(() => {});
   fetchWords.current = () => {
     const newGoodWords = getWords("goodWords", "en");
     const newBadWords = getWords("badWords", "en");
+
     setGoodWords((prev) => newGoodWords);
     setAvailableWords((prev) => newGoodWords);
-    setAllWords((prev) => [...newGoodWords, ...newBadWords]);
-    setStates((prev) => defaultState());
+    setBadWords((prev) => newBadWords);
+    setStates((prev) => getInitState());
   };
   useEffect(() => {
     fetchWords.current();
   }, []);
-
-  // useEffect(() => {}, [states]);
-
-  function onWordClick(e, word) {
-    e.preventDefault();
-    // console.log(word);
-    setSubmittedWords((prev) => [
-      ...prev,
-      { word: word, id: Date.now().toString() },
-    ]);
-  }
-
-  // console.log(states);
-
+  console.log(availableWords, "app");
   return (
     <>
       <header>
         <h1>WORDLE assistance</h1>
       </header>
 
-      <StateContext.Provider value={{ states, onLetterClick }}>
+      <StateContext.Provider value={{ onLetterClick, onWordClick, getState }}>
         <article>
-          <SubmittedWords
-            submittedWords={submittedWords}
-            states={states}
-            setStates={setStates}
+          <SubmittedWords submittedWords={submittedWords} />
+          <MostLetter
+            letters={letter}
+            selectLetter={selectLetter}
+            unselectLetter={unselectLetter}
           />
-          <AvailableWords
+          <WordsContainer
             availableWords={availableWords}
-            onClick={onWordClick}
+            goodWords={goodWords}
+            badWords={badWords}
           />
         </article>
       </StateContext.Provider>
     </>
   );
+  function updateUsedLetter() {
+    let usedLetter = {};
+    availableWords.forEach((word) => {
+      word.split("").forEach((letter) => {
+        if (usedLetter[letter] === undefined) usedLetter[letter] = 0;
+        usedLetter[letter]++;
+      });
+    });
+    let letters = Object.entries(usedLetter)
+      .sort(([, a], [, b]) => b - a)
+      .reduce((r, [k, v]) => [...r, k], [])
+      .filter((letter) => {
+        for (let i = 0; i < 5; i++)
+          if (getState(letter, i) !== 0) {
+            return false;
+          }
+        return true;
+      });
+    setLetter(letters);
+  }
+  function resetLetter() {
+    updateUsedLetter();
+    setTag([]);
+  }
 
-  function onLetterClick(e, letter, index, setState) {
+  function selectLetter(letter) {
+    setTag((prev) => [...prev, letter]);
+  }
+  function unselectLetter(letter) {
+    setTag((prev) => prev.splice(prev.indexOf(letter), 1));
+  }
+  function getState(letter, index) {
+    return states[index][letter];
+  }
+
+  function onWordClick(e, word) {
     e.preventDefault();
-    let tempStates = states;
-    tempStates[letter][index] = (tempStates[letter][index] + 1) % 4;
-    setStates(tempStates);
-    setState(tempStates[letter][index]);
-    console.log(tempStates[letter][index]);
+    setSubmittedWords((prev) => [
+      ...prev,
+      { word: word, id: Date.now().toString() },
+    ]);
   }
 
-  function defaultState() {
-    let defState = {};
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      .split("")
-      .forEach((letter) => (defState[letter] = [0, 0, 0, 0, 0]));
-    return defState;
+  function updateAvailableWords() {
+    let newAvailableWords = [...goodWords];
+    states.forEach((state, idx) => {
+      for (const key in state) {
+        newAvailableWords = newAvailableWords.filter((word) => {
+          if (states[idx][key] === 1) {
+            return !word.includes(key);
+          } else if (states[idx][key] === 2) {
+            return word.includes(key) && word[idx] !== key;
+          } else if (states[idx][key] === 3) {
+            return word[idx] === key;
+          } else return true;
+        });
+      }
+    });
+    setAvailableWords([...newAvailableWords]);
+  }
+
+  function onLetterClick(e, letter, index) {
+    e.preventDefault();
+    let tempStates = [...states];
+    // console.log(states, tempStates[index][letter]);
+    tempStates[index][letter] = (tempStates[index][letter] + 1) % 4;
+    setStates([...tempStates]);
+
+    updateAvailableWords();
+    resetLetter();
+  }
+
+  function getInitState() {
+    let initState = [{}, {}, {}, {}, {}];
+    initState.forEach((e) => {
+      "abcdefghijklmnopqrstuvwxyz".split("").forEach((i) => {
+        e[i] = 0;
+      });
+    });
+    return initState;
   }
 }
-
-function SubmittedWords({ submittedWords, states, setStates }) {
-  return (
-    <div className="submitted-words">
-      {/* {Array.from({ length: submittedWords.length }, (_, idx) => {
-        return <div>{"he"}</div>;
-      })} */}
-      {submittedWords.map(({ word, id }) => (
-        <SubmittedWord
-          states={states}
-          setStates={setStates}
-          word={word}
-          id={id}
-          key={id}
-        />
-      ))}
-    </div>
-  );
-}
-
-function SubmittedWord({ word, id, states, setStates }) {
-  return word
-    .split("")
-    .map((letter, idx) => (
-      <SubmittedLetter
-        key={id + idx}
-        letter={letter}
-        index={idx}
-        states={states}
-        setStates={setStates}
-      />
-    ));
-}
-function SubmittedLetter({ letter, index }) {
-  const [state, setState] = useState(0);
-  const { states, onLetterClick } = useContext(StateContext);
-  return (
-    <button
-      className={"submitted-letter " + STATES[state]}
-      onClick={(e) => {
-        onLetterClick(e, letter, index, setState);
-      }}
-    >
-      {letter}
-    </button>
-  );
-}
-
-function AvailableWords({ availableWords, onClick }) {
-  return (
-    <>
-      <h3>{availableWords.length} Available Word(s)</h3>
-      <section className="available-words">
-        {availableWords.map((word) => (
-          <button onClick={(e) => onClick(e, word.toUpperCase())} key={word}>
-            {word.toUpperCase()}
-          </button>
-        ))}
-      </section>
-    </>
-  );
-}
-
+export { StateContext };
 export default App;

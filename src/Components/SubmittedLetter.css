@@ -1,0 +1,10 @@
+.submitted-letter {
+  border: none;
+  max-width: 50px;
+  width: 100%;
+  font-size: 50px;
+  height: 70px;
+  margin: 5px;
+  padding: 2px;
+  transition: all .1s;
+}
