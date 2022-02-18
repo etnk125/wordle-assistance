@@ -8,6 +8,7 @@ function Words({ title, words, onWordClick }) {
   const WordElement = (word) => {
     return (
       <button
+        className="word-btn"
         key={title + word}
         onClick={(e) => {
           onWordClick(e, word);

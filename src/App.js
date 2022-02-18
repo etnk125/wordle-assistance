@@ -1,9 +1,10 @@
-// import "./App.css";
+import "./App.css";
 import React, { useEffect, useState, useRef, createContext } from "react";
 import getWords from "./Data";
 import SubmittedWords from "./Components/SubmittedWords";
 import MostLetter from "./Components/MostLetter";
 import WordsContainer from "./Components/WordListsContainer";
+import Header from "./Components/Header";
 
 const StateContext = createContext();
 function App() {
@@ -32,30 +33,30 @@ function App() {
   const resetLetter = useRef(() => {});
   resetLetter.current = () => {
     updateUsedLetter();
-    setTag([]);
+    setTag((prev) => []);
   };
   useEffect(() => {
     resetLetter.current();
-  }, [availableWords]);
+  }, [availableWords, submittedWords]);
   // console.log(availableWords, "app");
+  console.log(tag);
   return (
     <>
-      <header>
-        <h1>WORDLE assistance</h1>
-      </header>
+      <Header />
 
       <StateContext.Provider value={{ onLetterClick, onWordClick, getState }}>
         <article>
           <SubmittedWords submittedWords={submittedWords} />
           <MostLetter
+            tag={tag}
             letters={letter}
             selectLetter={selectLetter}
             unselectLetter={unselectLetter}
           />
           <WordsContainer
             availableWords={getFilteredWords(availableWords)}
-            goodWords={goodWords}
-            badWords={badWords}
+            goodWords={getFilteredWords(goodWords)}
+            badWords={getFilteredWords(badWords)}
           />
         </article>
       </StateContext.Provider>
@@ -64,9 +65,9 @@ function App() {
   function updateUsedLetter() {
     let usedLetter = {};
     availableWords.forEach((word) => {
-      word.split("").forEach((letter) => {
+      word.split("").forEach((letter, idx) => {
         if (usedLetter[letter] === undefined) usedLetter[letter] = 0;
-        usedLetter[letter]++;
+        if (!word.slice(0, idx).includes(letter)) usedLetter[letter]++;
       });
     });
     let letters = Object.entries(usedLetter)
@@ -87,7 +88,7 @@ function App() {
   }
   function unselectLetter(letter) {
     setTag((prev) => {
-      return prev.filter((i) => letter === i);
+      return prev.filter((i) => letter !== i);
     });
   }
   function getState(letter, index) {
@@ -103,17 +104,13 @@ function App() {
   }
 
   function getFilteredWords(words) {
-    console.log("tag", tag);
-    const ret = words.filter((word) => {
-      for (let i of tag) {
-        console.log(word.includes(i));
-        return word.includes(i);
-      }
-      return false;
+    tag.forEach((e) => {
+      words = words.filter((word) => word.includes(e));
     });
-    console.log(words, ret);
-    return ret;
+    return words;
   }
+
+  // function
 
   function updateAvailableWords() {
     let newAvailableWords = [...goodWords];
@@ -141,7 +138,7 @@ function App() {
     setStates([...tempStates]);
 
     updateAvailableWords();
-    resetLetter();
+    // resetLetter();
   }
 
   function getInitState() {

@@ -1,0 +1,10 @@
+.guess-words {
+  margin: 10px;
+  border-radius: 3px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: white;
+  background-color: rgb(206, 73, 2);
+}

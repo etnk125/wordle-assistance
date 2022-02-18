@@ -1,3 +1,25 @@
+.tag-btn {
+  width: 100%;
+  max-width: 1.8em;
+  height: 2em;
+  color: white;
+  background-color: #5b5b5b;
+  margin: 1px;
+  border: none;
+}
+
+.most-letter-container {
+  padding: 5px 0 15px;
+  text-align: center;
+  color: white;
+  background-color: rgb(55, 55, 55);
+}
+
+.most-letter-title {
+  display: block;
+  margin: 10px
+}
+
 .selected {
-  background-color: yellow;
+  background-color: var(--orange);
 }
