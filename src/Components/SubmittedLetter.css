@@ -1,0 +1,11 @@
+.submitted-letter {
+  border: none;
+  width: 90%;
+  font-size: 2rem;
+  height: 70px;
+  margin: 5px;
+  text-transform: uppercase;
+  vertical-align: middle;
+  transition: all .1s;
+
+}

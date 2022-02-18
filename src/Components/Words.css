@@ -1,0 +1,21 @@
+.words {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr)
+}
+
+.words-container {
+  margin: 5px
+}
+
+.loadmore-btn {
+  width: 100%
+}
+
+.word-btn {
+  border: none;
+  padding: 5px 0;
+  border-radius: 2px;
+  margin: 2px;
+  color: rgb(55, 55, 55);
+  background-color: white;
+}

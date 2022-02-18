@@ -1,0 +1,10 @@
+.answer-words {
+  margin: 10px;
+  border-radius: 3px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: white;
+  background-color: rgb(50, 120, 50);
+}
